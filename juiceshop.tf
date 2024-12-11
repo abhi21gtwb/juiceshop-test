@@ -1,46 +1,27 @@
-provider "azurerm" {
-  features {}
+resource "random_pet" "rg_name" {
+  prefix = var.resource_group_name_prefix
 }
+
 
 resource "azurerm_resource_group" "rg1" {
-  name = "juiceshop-rg1"
-  location = "West India" 
+  name = "random_pet.rg1_name.id"
+  location = var.resource_group_location
 }
 
 
-# Storage account
-#resource "azurerm_storage_account" "storageacct" {
-#  name                     = "myuniqnamestrg1987" # Must be globally unique
-#  resource_group_name      = azurerm_resource_group.rg1.name
-#  location                 = azurerm_resource_group.rg1.location
-#  account_tier             = "Standard"
-#  account_replication_type = "LRS"
-#}
-#
-#resource "azurerm_storage_share" "nginx" {
-#  name			= "nginxfileshare"
-#  storage_account_id   = azurerm_storage_account.storageacct.id
-#  quota			= 5
-#} 
-
-
-#Vnet and  Subnet for private IPs
+#Virtual Network and Subnet with Delegation
 resource "azurerm_virtual_network" "vnet198" {
-  name                = "juiceshop-vnet198"
+  name                = "vnet-${random_pet.rg_name.id}"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "subnet-aci1" {
-  name                 = "juiceshop-subnet1"
+  name                 = "subnet-${random_pet.rg_name.id}"
   resource_group_name  = azurerm_resource_group.rg1.name
   virtual_network_name = azurerm_virtual_network.vnet198.name
   address_prefixes       = ["10.0.1.0/24"]
-}
-
-output "subnet_id1" {
-  value = azurerm_subnet.subnet-aci1.id
 }
 
 resource "azurerm_subnet" "subnet-nginx2" {
@@ -102,6 +83,30 @@ resource "azurerm_container_group" "nginx2" {
 #  network_profile_id = azurerm_subnet.subnet-nginx2.id
 #   subnet_ids = [var.subnet_id2]
 }
+
+
+resource "azurerm_public_ip" "public_ip" {
+  name                = "lb-public-ip"
+  location            = azurerm_resource_group.rg1.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  allocation_method   = "Static"
+}
+
+resource "azurerm_lb" "lb" {
+  name                = "juice-shop-lb"
+  location            = azurerm_resource_group.rg1.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  frontend_ip_configuration {
+    name                 = "frontend"
+    public_ip_address_id = azurerm_public_ip.public_ip.id
+  }
+}
+
+resource "azurerm_lb_backend_address_pool" "backend" {
+  name                = "backend-pool"
+  loadbalancer_id     = azurerm_lb.lb.id
+}
+
 
 
 # Network Profile for both container groups
