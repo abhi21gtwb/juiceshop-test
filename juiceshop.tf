@@ -124,22 +124,25 @@ resource "azurerm_lb_backend_address_pool" "backend" {
 }
 
 
+# Variables
+variable "resource_group_location" {
+  type        = string
+  default     = "eastus"
+  description = "Location for all resources."
+}
 
-# Network Profile for both container groups
-#resource "azurerm_network_profile" "juiceshop_network_profile" {
-#  name                = "juiceshop-network-profile"
-#  location            = azurerm_resource_group.rg1.location
-#  resource_group_name = azurerm_resource_group.rg1.name
-#
-#  container_network_interface {
-#    name = "examplecnic"
-#
-#    ip_configuration {
-#      name      = "exampleipconfig"
-#      subnet_id = "${azurerm_subnet.subnet-aci1.id}"
-#    }
-#  }
-#}
+variable "resource_group_name_prefix" {
+  type        = string
+  default     = "rg"
+  description = "Prefix of the resource group name that's combined with a random value so name is unique in your Azure subscription."
+}
+
+variable "container_group_name_prefix" {
+  type        = string
+  default     = "acigroup"
+  description = "Prefix of the container group name that's combined with a random value so name is unique in your Azure subscription."
+}
+
 
 
 
