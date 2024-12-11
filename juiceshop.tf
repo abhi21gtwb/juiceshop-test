@@ -16,9 +16,9 @@ resource "azurerm_storage_account" "storageacct" {
   account_replication_type = "LRS"
 }
 
-resource "azurerm_strorage_share" "nginx" {
+resource "azurerm_storage_share" "nginx" {
   name			= "nginxfileshare"
-  storage_accout_name   = azurerm_storage_account.storageacct.name
+  storage_account_id   = azurerm_storage_account.storageacct.id
   quota			= 5
 } 
 
@@ -78,14 +78,15 @@ resource "azurerm_container_group" "nginx2" {
       port     = 80
       protocol = "TCP"
     }
+
     ports {
       port	= 443
       protocol  = "TCP"
-  }
-
+    }
+ }
   ip_address_type = "Private"
   network_profile_id = azurerm_network_profile.juiceshop_network_profile.id
-}
+ }
 
 
 # Network Profile for both container groups
