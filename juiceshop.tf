@@ -7,20 +7,21 @@ resource "azurerm_resource_group" "rg1" {
   location = "West India" 
 }
 
-# Storage account
-resource "azurerm_storage_account" "storageacct" {
-  name                     = "myuniqnamestrg1987" # Must be globally unique
-  resource_group_name      = azurerm_resource_group.rg1.name
-  location                 = azurerm_resource_group.rg1.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
 
-resource "azurerm_storage_share" "nginx" {
-  name			= "nginxfileshare"
-  storage_account_id   = azurerm_storage_account.storageacct.id
-  quota			= 5
-} 
+# Storage account
+#resource "azurerm_storage_account" "storageacct" {
+#  name                     = "myuniqnamestrg1987" # Must be globally unique
+#  resource_group_name      = azurerm_resource_group.rg1.name
+#  location                 = azurerm_resource_group.rg1.location
+#  account_tier             = "Standard"
+#  account_replication_type = "LRS"
+#}
+#
+#resource "azurerm_storage_share" "nginx" {
+#  name			= "nginxfileshare"
+#  storage_account_id   = azurerm_storage_account.storageacct.id
+#  quota			= 5
+#} 
 
 
 #Vnet and  Subnet for private IPs
@@ -36,6 +37,10 @@ resource "azurerm_subnet" "subnet-aci1" {
   resource_group_name  = azurerm_resource_group.rg1.name
   virtual_network_name = azurerm_virtual_network.vnet198.name
   address_prefixes       = ["10.0.1.0/24"]
+}
+
+output "subnet_id1" {
+  value = azurerm_subnet.subnet-aci1.id
 }
 
 resource "azurerm_subnet" "subnet-nginx2" {
@@ -64,7 +69,9 @@ resource "azurerm_container_group" "juiceshop1" {
   }
 
   ip_address_type = "Private"  # Ensures no external IP
-  network_profile_id = azurerm_subnet.subnet-aci1.id
+  subnet_ids = [azurerm_subnet.subnet-aci1.id]
+# network_profile_id = azurerm_subnet.subnet-aci1.id
+#  subnet_ids  = [var.subnet_id1]
 }
 
 
@@ -91,8 +98,10 @@ resource "azurerm_container_group" "nginx2" {
     }
  }
   ip_address_type = "Private"
-  network_profile_id = azurerm_subnet.subnet-nginx2.id
- }
+   subnet_ids = [azurerm_subnet.subnet-nginx2.id]
+#  network_profile_id = azurerm_subnet.subnet-nginx2.id
+#   subnet_ids = [var.subnet_id2]
+}
 
 
 # Network Profile for both container groups
@@ -110,6 +119,7 @@ resource "azurerm_container_group" "nginx2" {
 #    }
 #  }
 #}
+
 
 
 output "juiceshop_internal_ip" {
