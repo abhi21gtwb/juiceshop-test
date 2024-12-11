@@ -38,6 +38,12 @@ resource "azurerm_subnet" "subnet-aci1" {
   address_prefixes       = ["10.0.1.0/24"]
 }
 
+resource "azurerm_subnet" "subnet-nginx2" {
+  name                 = "juiceshop-nginx"
+  resource_group_name  = azurerm_resource_group.rg1.name
+  virtual_network_name = azurerm_virtual_network.vnet198.name
+  address_prefixes       = ["10.0.2.0/24"]
+}
 
 # Container Instance for JuiceShop
 resource "azurerm_container_group" "juiceshop1" {
@@ -58,7 +64,7 @@ resource "azurerm_container_group" "juiceshop1" {
   }
 
   ip_address_type = "Private"  # Ensures no external IP
-  network_profile_id = azurerm_network_profile.juiceshop_network_profile.id
+  network_profile_id = azurerm_subnet.subnet-aci1.id
 }
 
 
@@ -85,25 +91,25 @@ resource "azurerm_container_group" "nginx2" {
     }
  }
   ip_address_type = "Private"
-  network_profile_id = azurerm_network_profile.juiceshop_network_profile.id
+  network_profile_id = azurerm_subnet.subnet-nginx2.id
  }
 
 
 # Network Profile for both container groups
-resource "azurerm_network_profile" "juiceshop_network_profile" {
-  name                = "juiceshop-network-profile"
-  location            = azurerm_resource_group.rg1.location
-  resource_group_name = azurerm_resource_group.rg1.name
-
-  container_network_interface {
-    name = "examplecnic"
-
-    ip_configuration {
-      name      = "exampleipconfig"
-      subnet_id = "${azurerm_subnet.subnet-aci1.id}"
-    }
-  }
-}
+#resource "azurerm_network_profile" "juiceshop_network_profile" {
+#  name                = "juiceshop-network-profile"
+#  location            = azurerm_resource_group.rg1.location
+#  resource_group_name = azurerm_resource_group.rg1.name
+#
+#  container_network_interface {
+#    name = "examplecnic"
+#
+#    ip_configuration {
+#      name      = "exampleipconfig"
+#      subnet_id = "${azurerm_subnet.subnet-aci1.id}"
+#    }
+#  }
+#}
 
 
 output "juiceshop_internal_ip" {
