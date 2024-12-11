@@ -22,14 +22,30 @@ resource "azurerm_subnet" "subnet-aci1" {
   resource_group_name  = azurerm_resource_group.rg1.name
   virtual_network_name = azurerm_virtual_network.vnet198.name
   address_prefixes       = ["10.0.1.0/24"]
+
+  delegation {
+    name = "aci-delegation"
+    service_delegation {
+      name    = "Microsoft.ContainerInstance/containerGroups"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
 }
 
-resource "azurerm_subnet" "subnet-nginx2" {
-  name                 = "juiceshop-nginx"
-  resource_group_name  = azurerm_resource_group.rg1.name
-  virtual_network_name = azurerm_virtual_network.vnet198.name
-  address_prefixes       = ["10.0.2.0/24"]
+# Container Group
+resource "random_string" "container_name" {
+  length  = 25
+  lower   = true
+  upper   = false
+  special = false
 }
+
+#resource "azurerm_subnet" "subnet-nginx2" {
+#  name                 = "juiceshop-nginx"
+#  resource_group_name  = azurerm_resource_group.rg1.name
+#  virtual_network_name = azurerm_virtual_network.vnet198.name
+#  address_prefixes       = ["10.0.2.0/24"]
+#}
 
 # Container Instance for JuiceShop
 resource "azurerm_container_group" "juiceshop1" {
