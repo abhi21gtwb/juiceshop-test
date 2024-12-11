@@ -7,6 +7,22 @@ resource "azurerm_resource_group" "rg1" {
   location = "West India" 
 }
 
+# Storage account
+resource "azurerm_storage_account" "storageacct" {
+  name                     = "myuniqnamestrg1987" # Must be globally unique
+  resource_group_name      = azurerm_resource_group.rg1.name
+  location                 = azurerm_resource_group.rg1.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_strorage_share" "nginx" {
+  name			= "nginxfileshare"
+  storage_accout_name   = azurerm_storage_account.storageacct.name
+  quota			= 5
+} 
+
+
 #Vnet and  Subnet for private IPs
 resource "azurerm_virtual_network" "vnet198" {
   name                = "juiceshop-vnet198"
@@ -22,12 +38,6 @@ resource "azurerm_subnet" "subnet-aci1" {
   address_prefixes       = ["10.0.1.0/24"]
 }
 
-resource "azurerm_subnet" "subnet-nginx2" {
-  name                 = "juiceshop-nginx2"
-  resource_group_name  = azurerm_resource_group.rg1.name
-  virtual_network_name = azurerm_virtual_network.vnet198.name
-  address_prefixes       = ["10.0.2.0/24"]
-}
 
 # Container Instance for JuiceShop
 resource "azurerm_container_group" "juiceshop1" {
@@ -65,14 +75,12 @@ resource "azurerm_container_group" "nginx2" {
     cpu    = "1"
     memory = "1.5"
     ports {
-      port     = 443
+      port     = 80
       protocol = "TCP"
     }
-
-    volume {
-      name = "nginx-config"
-      mount_path = "/etc/nginx/conf.d"
-    }
+    ports {
+      port	= 443
+      protocol  = "TCP"
   }
 
   ip_address_type = "Private"
@@ -95,3 +103,12 @@ resource "azurerm_network_profile" "juiceshop_network_profile" {
     }
   }
 }
+
+
+output "juiceshop_internal_ip" {
+  value = azurerm_container_group.juiceshop1.ip_address
+}
+
+#output "lb_ip" {
+#  value = azurerm_public_ip.juiceshop_lb_pip.ip_address
+#}
