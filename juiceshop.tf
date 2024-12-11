@@ -32,6 +32,22 @@ resource "azurerm_subnet" "subnet-aci1" {
   }
 }
 
+resource "azurerm_subnet" "subnet-nginx2" {
+  name                 = "subnet-${random_pet.rg_name.id}"
+  resource_group_name  = azurerm_resource_group.rg1.name
+  virtual_network_name = azurerm_virtual_network.vnet198.name
+  address_prefixes       = ["10.0.2.0/24"]
+
+
+  delegation {
+    name = "aci-delegation"
+    service_delegation {
+      name    = "Microsoft.ContainerInstance/containerGroups"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
+}
+
 # Container Group
 resource "random_string" "container_name" {
   length  = 25
@@ -40,19 +56,14 @@ resource "random_string" "container_name" {
   special = false
 }
 
-#resource "azurerm_subnet" "subnet-nginx2" {
-#  name                 = "juiceshop-nginx"
-#  resource_group_name  = azurerm_resource_group.rg1.name
-#  virtual_network_name = azurerm_virtual_network.vnet198.name
-#  address_prefixes       = ["10.0.2.0/24"]
-#}
-
 # Container Instance for JuiceShop
 resource "azurerm_container_group" "juiceshop1" {
   name                = "${var.container_group_name_prefix}-${random_string.container_name.result}"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   os_type             = "Linux"
+  subnet_ids          = [azurerm_subnet.subnet-aci1.id]  # Subnet for private IP
+  ip_address_type     = "Private"                  # Must use private IP for subnet
 
   container {
     name   = "${var.container_name_prefix}-${random_string.container_name.result}"
@@ -64,40 +75,33 @@ resource "azurerm_container_group" "juiceshop1" {
       protocol = "TCP"
     }
   }
-
-  ip_address_type = "Private"  # Ensures no external IP
-  subnet_ids = [azurerm_subnet.subnet-aci1.id]
-# network_profile_id = azurerm_subnet.subnet-aci1.id
-#  subnet_ids  = [var.subnet_id1]
 }
 
 
 # Nginx Reverse Proxy Container
 resource "azurerm_container_group" "nginx2" {
-  name                = "nginx-proxy2"
+  name                = "${var.container_group_name_prefix}-${random_string.container_name.result}"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   os_type             = "Linux"
+  subnet_ids          = [azurerm_subnet.subnet-nginx2.id]  # Subnet for private IP
+  ip_address_type     = "Private"                  # Must use private IP for subnet
 
   container {
-    name   = "nginx"
-    image  = "nginx"
-    cpu    = "1"
-    memory = "1.5"
+    name   = "${var.container_name_prefix}-${random_string.container_name.result}"
+    image  = var.image2
+    cpu    = var.cpu_cores
+    memory = var.memory_in_gb
     ports {
-      port     = 80
+      port     = var.port
       protocol = "TCP"
     }
 
     ports {
-      port	= 443
+      port	= var.port2
       protocol  = "TCP"
     }
  }
-  ip_address_type = "Private"
-   subnet_ids = [azurerm_subnet.subnet-nginx2.id]
-#  network_profile_id = azurerm_subnet.subnet-nginx2.id
-#   subnet_ids = [var.subnet_id2]
 }
 
 
@@ -140,8 +144,15 @@ variable "resource_group_name_prefix" {
 variable "container_group_name_prefix" {
   type        = string
   default     = "acigroup"
-  description = "Prefix of the container group name that's combined with a random value so name is unique in your Azure subscription."
+  description = "Prefix of the container group name that's combined with a random value so name is unique in your Azure subscription.."
 }
+
+variable "container_name_prefix" {
+  type        = string
+  default     = "aci"
+  description = "Prefix of the container name that's combined with a random value so name is unique in your Azure subscription."
+}
+
 
 variable "image" {
   type        = string
@@ -153,7 +164,7 @@ variable "image" {
 variable "port" {
   type        = number
   default     = 3000
-  description = "Port to open on the container."
+  description = "Port to open on the container 1."
 }
 
 variable "cpu_cores" {
@@ -167,6 +178,20 @@ variable "memory_in_gb" {
   default     = 2
   description = "The amount of memory to allocate to the container in gigabytes."
 }
+
+
+variable "image2" {
+  type        = string
+  default     = "nginx.latest"
+  description = "Container image to deploy. Should be of the form repoName/imagename."
+}
+
+variable "port2" {
+  type        = number
+  default     = 80
+  description = "Port to open on the container."
+}
+
 
 output "juiceshop_internal_ip" {
   value = azurerm_container_group.juiceshop1.ip_address
