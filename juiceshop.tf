@@ -49,18 +49,18 @@ resource "random_string" "container_name" {
 
 # Container Instance for JuiceShop
 resource "azurerm_container_group" "juiceshop1" {
-  name                = "juiceshop1"
+  name                = "${var.container_group_name_prefix}-${random_string.container_name.result}"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   os_type             = "Linux"
 
   container {
-    name   = "juiceshop"
-    image  = "bkimminich/juice-shop:v15.0.0"
-    cpu    = "1"
-    memory = "1.5"
+    name   = "${var.container_name_prefix}-${random_string.container_name.result}"
+    image  = var.image
+    cpu    = var.cpu_cores
+    memory = var.memory_in_gb
     ports {
-      port     = 3000
+      port     = var.port
       protocol = "TCP"
     }
   }
@@ -143,8 +143,30 @@ variable "container_group_name_prefix" {
   description = "Prefix of the container group name that's combined with a random value so name is unique in your Azure subscription."
 }
 
+variable "image" {
+  type        = string
+  default     = "bkimminich/juice-shop:v15.0.0"
+  description = "Container image to deploy. Should be of the form repoName/imagename"
+}
 
 
+variable "port" {
+  type        = number
+  default     = 3000
+  description = "Port to open on the container."
+}
+
+variable "cpu_cores" {
+  type        = number
+  default     = 1
+  description = "The number of CPU cores to allocate to the container."
+}
+
+variable "memory_in_gb" {
+  type        = number
+  default     = 2
+  description = "The amount of memory to allocate to the container in gigabytes."
+}
 
 output "juiceshop_internal_ip" {
   value = azurerm_container_group.juiceshop1.ip_address
