@@ -8,9 +8,9 @@ provider "azurerm" {
   use_msi         = false # Explicitly disable MSI to use the provided credentials
 }
 
-resource "azurerm_resource_group" "rg12" {
-  name = "random_pet.rg_name.id"
-  location = var.resource_group_location
+resource "azurerm_resource_group" "rg" {
+  name     = "juiceshop-rg"
+  location = "centralus" # Replace with your preferred Azure region
 }
 
 # Declare input variables for Azure authentication
