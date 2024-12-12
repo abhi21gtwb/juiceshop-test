@@ -164,7 +164,7 @@ resource "azurerm_container_group" "nginx2" {
 # Variables
 variable "resource_group_location" {
   type        = string
-  default     = "eastus"
+  default     = "centralus"
   description = "Location for all resources."
 }
 
