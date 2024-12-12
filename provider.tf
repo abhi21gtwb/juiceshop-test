@@ -5,6 +5,7 @@ provider "azurerm" {
   client_secret   = var.client_secret
   subscription_id = var.subscription_id
   tenant_id       = var.tenant_id
+  use_msi         = false # Explicitly disable MSI to use the provided credentials
 }
 
 resource "azurerm_resource_group" "rg1" {
