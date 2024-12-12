@@ -3,10 +3,10 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - master1
+      - master
   pull_request:
     branches:
-      - master1
+      - master
 
 jobs:
   terraform:
@@ -51,5 +51,5 @@ jobs:
           TF_VAR_tenant_id: ${{ secrets.ARM_TENANT_ID }}
           TF_VAR_client_id: ${{ secrets.ARM_CLIENT_ID }}
           TF_VAR_client_secret: ${{ secrets.ARM_CLIENT_SECRET }}
-        run: terraform destroy --auto-approve
-        #run: terraform apply --auto-approve
+        #run: terraform destroy --auto-approve
+        run: terraform apply --auto-approve
