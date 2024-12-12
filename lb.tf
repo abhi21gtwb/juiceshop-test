@@ -4,6 +4,7 @@ resource "azurerm_public_ip" "example" {
   location            = "centralus"
   resource_group_name = "juiceshop-rg"
   allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 # Load Balancer configuration
@@ -11,6 +12,7 @@ resource "azurerm_lb" "example" {
   name                = "TestLoadBalancer"
   location            = "centralus"
   resource_group_name = "juiceshop-rg"
+  sku                 = "Standard"
 
   frontend_ip_configuration {
     name                 = "PublicIPAddress"
