@@ -1,14 +1,14 @@
 resource "azurerm_public_ip" "public_ip" {
   name                = "lb-public-ip"
-  location            = azurerm_resource_group.rg1.location
-  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg12.location
+  resource_group_name = azurerm_resource_group.rg12.name
   allocation_method   = "Static"
 }
 
 resource "azurerm_lb" "lb" {
   name                = "juice-shop-lb"
-  location            = azurerm_resource_group.rg1.location
-  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg12.location
+  resource_group_name = azurerm_resource_group.rg12.name
   frontend_ip_configuration {
     name                 = "frontend"
     public_ip_address_id = azurerm_public_ip.public_ip.id

@@ -12,14 +12,14 @@ resource "random_pet" "rg_name" {
 #Virtual Network and Subnet with Delegation
 resource "azurerm_virtual_network" "vnet198" {
   name                = "vnet-${random_pet.rg_name.id}"
-  location            = azurerm_resource_group.rg1.location
-  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg12.location
+  resource_group_name = azurerm_resource_group.rg12.name
   address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "subnet-aci1" {
   name                 = "subnet-${random_pet.rg_name.id}"
-  resource_group_name  = azurerm_resource_group.rg1.name
+  resource_group_name  = azurerm_resource_group.rg12.name
   virtual_network_name = azurerm_virtual_network.vnet198.name
   address_prefixes       = ["10.0.1.0/24"]
 
@@ -34,7 +34,7 @@ resource "azurerm_subnet" "subnet-aci1" {
 
 resource "azurerm_subnet" "subnet-nginx2" {
   name                 = "subnet-${random_pet.rg_name.id}"
-  resource_group_name  = azurerm_resource_group.rg1.name
+  resource_group_name  = azurerm_resource_group.rg12.name
   virtual_network_name = azurerm_virtual_network.vnet198.name
   address_prefixes       = ["10.0.2.0/24"]
 
@@ -59,8 +59,8 @@ resource "random_string" "container_name" {
 # Container Instance for JuiceShop
 resource "azurerm_container_group" "juiceshop1" {
   name                = "${var.container_group_name_prefix}-${random_string.container_name.result}"
-  location            = azurerm_resource_group.rg1.location
-  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg12.location
+  resource_group_name = azurerm_resource_group.rg12.name
   os_type             = "Linux"
   subnet_ids          = [azurerm_subnet.subnet-aci1.id]  # Subnet for private IP
   ip_address_type     = "Private"                  # Must use private IP for subnet
@@ -81,8 +81,8 @@ resource "azurerm_container_group" "juiceshop1" {
 # Nginx Reverse Proxy Container
 resource "azurerm_container_group" "nginx2" {
   name                = "nginx-proxy-${random_string.container_name.result}"
-  location            = azurerm_resource_group.rg1.location
-  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg12.location
+  resource_group_name = azurerm_resource_group.rg12.name
   os_type             = "Linux"
   subnet_ids          = [azurerm_subnet.subnet-nginx2.id]  # Subnet for private IP
   ip_address_type     = "Private"                  # Must use private IP for subnet
@@ -107,15 +107,15 @@ resource "azurerm_container_group" "nginx2" {
 
 #resource "azurerm_public_ip" "public_ip" {
 #  name                = "lb-public-ip"
-#  location            = azurerm_resource_group.rg1.location
-#  resource_group_name = azurerm_resource_group.rg1.name
+#  location            = azurerm_resource_group.rg12.location
+#  resource_group_name = azurerm_resource_group.rg12.name
 #  allocation_method   = "Static"
 #}
 #
 #resource "azurerm_lb" "lb" {
 #  name                = "juice-shop-lb"
-#  location            = azurerm_resource_group.rg1.location
-#  resource_group_name = azurerm_resource_group.rg1.name
+#  location            = azurerm_resource_group.rg12.location
+#  resource_group_name = azurerm_resource_group.rg12.name
 #  frontend_ip_configuration {
 #    name                 = "frontend"
 #    public_ip_address_id = azurerm_public_ip.public_ip.id
