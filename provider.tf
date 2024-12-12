@@ -9,7 +9,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "juiceshop-rgnew"
+  name     = "juiceshop-rg"
   location = "centralus" # Replace with your preferred Azure region
 }
 
