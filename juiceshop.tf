@@ -1,7 +1,7 @@
 # Virtual Network and Subnet with Delegation
 resource "azurerm_virtual_network" "vnet" {
   name                = "vnet-juiceshop"
-  location            = "westus"
+  location            = "centralus"
   resource_group_name = "juiceshop-rg"
   address_space       = ["10.0.0.0/16"]
 }
@@ -23,7 +23,7 @@ resource "azurerm_subnet" "subnet" {
 
 resource "azurerm_container_group" "container" {
   name                = "juiceshop-aci-group"
-  location            = "westus"
+  location            = "centralus"
   resource_group_name = "juiceshop-rg"
   os_type             = "Linux"
   restart_policy      = "Always"
