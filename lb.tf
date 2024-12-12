@@ -52,3 +52,7 @@ resource "azurerm_lb_rule" "example" {
   probe_id                       = azurerm_lb_probe.lb_probe.id
   loadbalancer_id                = azurerm_lb.lb.id
 }
+
+output "lb_ip" {
+  value = azurerm_public_ip.public_ip.ip_address
+}
