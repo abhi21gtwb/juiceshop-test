@@ -17,8 +17,8 @@ terraform {
   }
   backend "azurerm" {
       resource_group_name  = "juiceshop-rg"
-      storage_account_name = "juiceshopsan19159"
-      container_name       = "juiceshopcn19159"
+      storage_account_name = "storageaccount191599"
+      container_name       = "vhds"
       key                  = "terraform.tfstate"
   }
 
