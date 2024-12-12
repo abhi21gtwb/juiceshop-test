@@ -20,7 +20,7 @@ terraform {
       storage_account_name = "storageaccount191599"
       container_name       = "vhds"
       key                  = "terraform.tfstate"
-      use_azuread_auth     = true
+      access_key           = "hNToqD5BAU2KNEdbPh7HYOfupNNiwnWa9psXvIb+Y2jLFvPL/PdqUaUh3UFUDohBOsTyMKsfO+Q2+AStRX1T/g=="
   }
 
 }
