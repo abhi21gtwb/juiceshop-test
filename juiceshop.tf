@@ -237,6 +237,3 @@ output "juiceshop_internal_ip" {
   value = azurerm_container_group.juiceshop1.ip_address
 }
 
-#output "lb_ip" {
-#  value = azurerm_public_ip.public_ip.ip_address
-#}
