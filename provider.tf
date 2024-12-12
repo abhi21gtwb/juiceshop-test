@@ -7,6 +7,11 @@ provider "azurerm" {
   tenant_id       = var.tenant_id
 }
 
+resource "azurerm_resource_group" "rg1" {
+  name = "random_pet.rg1_name.id"
+  location = var.resource_group_location
+}
+
 # Declare input variables for Azure authentication
 variable "client_id" {
   description = "Azure Client ID"
