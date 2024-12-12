@@ -79,30 +79,30 @@ resource "azurerm_container_group" "juiceshop1" {
 
 
 # Nginx Reverse Proxy Container
-resource "azurerm_container_group" "nginx2" {
-  name                = "nginx-proxy-${random_string.container_name.result}"
-  location            = azurerm_resource_group.rg12.location
-  resource_group_name = azurerm_resource_group.rg12.name
-  os_type             = "Linux"
-  subnet_ids          = [azurerm_subnet.subnet-nginx2.id]  # Subnet for private IP
-  ip_address_type     = "Private"                  # Must use private IP for subnet
-
-  container {
-    name   = "${var.container_name_prefix}-${random_string.container_name.result}"
-    image  = var.image2
-    cpu    = var.cpu_cores2
-    memory = var.memory_in_gb
-    ports {
-      port     = var.port
-      protocol = "TCP"
-    }
-
-    ports {
-      port	= var.port2
-      protocol  = "TCP"
-    }
- }
-}
+#resource "azurerm_container_group" "nginx2" {
+#  name                = "nginx-proxy-${random_string.container_name.result}"
+#  location            = azurerm_resource_group.rg12.location
+#  resource_group_name = azurerm_resource_group.rg12.name
+#  os_type             = "Linux"
+#  subnet_ids          = [azurerm_subnet.subnet-nginx2.id]  # Subnet for private IP
+#  ip_address_type     = "Private"                  # Must use private IP for subnet
+#
+#  container {
+#    name   = "${var.container_name_prefix}-${random_string.container_name.result}"
+#    image  = var.image2
+#    cpu    = var.cpu_cores2
+#    memory = var.memory_in_gb
+#    ports {
+#      port     = var.port
+#      protocol = "TCP"
+#    }
+#
+#    ports {
+#      port	= var.port2
+#      protocol  = "TCP"
+#    }
+# }
+#}
 
 
 #resource "azurerm_public_ip" "public_ip" {
@@ -189,7 +189,7 @@ variable "container_name_prefix" {
 
 variable "image" {
   type        = string
-  default     = "bkimminich/juice-shop:v15.0.0"
+  default     = "mcr.microsoft.com/azuredocs/aci-helloworld"
   description = "Container image to deploy. Should be of the form repoName/imagename"
 }
 
