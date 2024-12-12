@@ -8,6 +8,22 @@ provider "azurerm" {
   use_msi         = false # Explicitly disable MSI to use the provided credentials
 }
 
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~>3.0"
+    }
+  }
+  backend "azurerm" {
+      resource_group_name  = "juiceshop-rg"
+      storage_account_name = "juiceshopsan19159"
+      container_name       = "juiceshopcn19159"
+      key                  = "terraform.tfstate"
+  }
+
+}
+
 #resource "azurerm_resource_group" "rg" {
 #  name     = "juiceshop-rg"
 # location = "centralus" # Replace with your preferred Azure region
